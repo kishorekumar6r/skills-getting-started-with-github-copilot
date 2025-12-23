@@ -70,9 +70,9 @@
                           ${info.participants
                             .map(
                               (email) =>
-                                `<li><span class="participant-avatar">${email
+                                `<li class="participant-item"><span class="participant-avatar">${email
                                   .charAt(0)
-                                  .toUpperCase()}</span> ${email}</li>`
+                                  .toUpperCase()}</span> ${email} <span class="delete-participant" title="Remove participant" data-email="${email}">&#10060;</span></li>`
                             )
                             .join("")}
                         </ul>`

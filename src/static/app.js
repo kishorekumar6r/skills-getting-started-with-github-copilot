@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
       Object.entries(activities).forEach(([name, details]) => {
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
+        activityCard.setAttribute("data-activity-id", name);
 
         const spotsLeft = details.max_participants - details.participants.length;
 
@@ -34,16 +35,32 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${details.participants
                       .map(
                         (email) =>
-                          `<li><span class="participant-avatar">${email
+                          `<li class="participant-item"><span class="participant-avatar">${email
                             .charAt(0)
-                            .toUpperCase()}</span> ${email}</li>`
+                            .toUpperCase()}</span> ${email} <span class="delete-participant" title="Remove participant" data-email="${email}">&#10060;</span></li>`
                       )
                       .join("")}
                   </ul>`
                 : `<span class="no-participants">No participants yet.</span>`
             }
-          </div>
-        `;
+        </div>
+      `;
+  // Handle participant delete (unregister) globally after DOM is rendered
+  document.addEventListener('click', async function (e) {
+    if (e.target.classList.contains('delete-participant')) {
+      const email = e.target.getAttribute('data-email');
+      const activityCard = e.target.closest('.activity-card');
+      if (!email || !activityCard) return;
+      const activityId = activityCard.getAttribute('data-activity-id');
+      if (!activityId) return;
+      try {
+        await fetch(`/unregister/${activityId}/${encodeURIComponent(email)}`, { method: 'DELETE' });
+        await fetchActivities(); // Refresh activities to show updated participants
+      } catch (err) {
+        alert('Failed to remove participant.');
+      }
+    }
+  });
 
         activitiesList.appendChild(activityCard);
 
